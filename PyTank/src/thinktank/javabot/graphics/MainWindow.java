@@ -16,7 +16,7 @@ import thinktank.javabot.physics.Physique;
 public class MainWindow extends JFrame{
 
 	private static PanneauDessin game;
-	public static MainWindow window = new MainWindow();
+	//public static MainWindow window = new MainWindow();
 	private static JPanel container;
 	public static Physique phy;
 	
