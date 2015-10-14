@@ -1,6 +1,5 @@
 package pyTank;
 
-import thinktank.javabot.graphics.GraphicInterface;
 import thinktank.javabot.graphics.MainWindow;
 
 
