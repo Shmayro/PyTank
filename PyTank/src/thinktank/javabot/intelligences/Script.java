@@ -14,51 +14,52 @@ import thinktank.javabot.physics.Tank;
 
 
 /**
+*
 * @author Gabriel
 */
+
+
 public class Script {
 
-//=============================================================================
-// Attributs
-	
-	private String m_instructions = "";
-	private String m_filename;
-	private int m_currentLine = 0;
-	private String m_tmpfile_name;
-	private String  m_tmpfile_content = "";
-	private Intelligence m_intelligence;
-
-
-//=============================================================================
-// Méthodes publiques
-	
+	private String instructions = "";
+	private String filename;
+	private int currentLine = 0;
+	private String tmpFileName;
+	private String  tmpFileContent = "";
 	/**
-     * Constructeur dépendant d'un nom de fichier et d'une intelligence.
-     * @param filename nom du fichier script à charger
-     * @param intelligence 
+     * @see Intelligence
+     */
+	private Intelligence intelligence;
+	/**
+     * Contient les instructions du fichier Python
+     * @param filename, intelligence
      */
 	public Script(String filename, Intelligence intelligence)
 	{
 		
-		m_filename = filename;
-		m_intelligence = intelligence;
-		importInstructionsFromFile(this.m_filename);
-		m_tmpfile_name = generateRandomFilename();
+		this.filename = filename;
+		this.intelligence = intelligence;
+		importInstructionsFromFile(this.filename);
+		generateTmpFileName();
+		//System.out.println("generated file: "+tmpFileName);
+		//System.out.println("Content:  "+tmpFileContent);
 		writeTmpFile();
+		
+	
 	}
 
-	/**
-	 * Mutateur du nom de fichier du script
-	 * 
-	 * @param filename nouveau nom de fichier
-	 */
+
 	public void setFileName(String filename)
+	/**
+     * Attribue le chemin du fichier de script sélectionné
+     * @param filename
+     */
 	{
-		m_filename = filename;
-		m_instructions = "";
-		importInstructionsFromFile(m_filename);
+		this.filename = filename;
+		instructions = "";
+		importInstructionsFromFile(this.filename);
 		writeTmpFile();
-		updateInstructions(m_instructions);
+		updateInstructions(instructions);
 	}
 	
 	public String getInstructions()
@@ -67,16 +68,17 @@ public class Script {
      * @return instructions
      */
 	{
-		return m_instructions;
+		return instructions;
 	}
 	
+
 	public void setCurrentLine(int line)
 	/**
      * Attribue la ligne en cours
      * @param line
      */
 	{
-		m_currentLine = line;
+		currentLine = line;
 	}
 	
 	public int getCurrentLine()
@@ -85,7 +87,7 @@ public class Script {
      * @return currentLine
      */
 	{
-		return m_currentLine;
+		return currentLine;
 	}
 	
 	public String getTmpFileName()
@@ -94,7 +96,7 @@ public class Script {
      * @return tmpFileName
      */
 	{
-		return m_tmpfile_name;
+		return tmpFileName;
 	}
 	
 	public int startPositionLine(int line)
@@ -106,7 +108,7 @@ public class Script {
      */	
 	{
 		int i = 0;
-		String[] lines = m_instructions.split("\n");
+		String[] lines = instructions.split("\n");
 		try
 		{
 			for (int j = 0; j < line - 1; j++)
@@ -131,7 +133,7 @@ public class Script {
      */	
 	{
 		int i = 0;
-		String[] lines = m_instructions.split("\n");
+		String[] lines = instructions.split("\n");
 		try
 		{
 			for (int j = 0; j < line ; j++)
@@ -147,83 +149,19 @@ public class Script {
 		return i;
 	}
 	
-	public void updateInstructions(String newInstructions)
-	/**
-     * Applique la surcouche au script Python
-     * @param newInstructions
-     */	
-	{
-		
-		m_instructions = newInstructions;
-		m_tmpfile_content= addLayer(m_instructions);
-		writeTmpFile();
-		Tank tmp = m_intelligence.getTankR().tankPhy;
-		m_intelligence = new Intelligence(m_filename, m_intelligence.getIntels(), tmp, this);
-		tmp.setIntelligence(m_intelligence);
-	}
-	
 
-//=============================================================================
-// Méthodes privées
-	
+	private void generateTmpFileName()
 	/**
-	 * Génère un chaîne de 50 caractères dans l'objectif d'être le nom d'un 
-	 * fichier temporaire. Elle commence par un '.' pour permettre d'être un 
-	 * fichier caché sous les système UNIX.
-	 * 
-	 * @return une chaîne de caractères alphanumériques aléatoires
-	 */
-	private String generateRandomFilename()
+	 * Génère un nom aléatoire pour le fichier .py temporaire
+     */
 	{
 		String charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		String ret;
-		ret = "."; // fichier caché
-		for (int i = 0; i < 49; i++)
+		tmpFileName = "."; /* Fichier caché sur les sytèmes UNIX */
+		for (int i = 0; i < 50; i++)
 		{
-			ret += charset.charAt((int) (Math.random() * charset.length())); // ajout d'un caractere aléatoire 
-		}
-		return ret;
-	}
-	
-	private void importInstructionsFromFile(String path)
-	/**
-	 * chemin du script pour l'import de l'instruction
-     * @param path
-     */	
-	{
-		if (path == null)
-		{
-			m_instructions = "print \"Hello World !\"";
-			m_tmpfile_content = addLayer(m_instructions);
-			GraphicInterface.textAreaCode.setText(m_instructions);
-			return ;
-		}
-		BufferedReader br = null;
-		try {
-
-			String sCurrentLine;
-
-			br = new BufferedReader(new FileReader(path));
-
-			while ((sCurrentLine = br.readLine()) != null) {
-				m_instructions += sCurrentLine+'\n';
-				//tmpFileContent += "print str(inspect.currentframe().f_back.f_lineno)";
-				
-						m_tmpfile_content = addLayer(m_instructions);
-				
-			}
-			GraphicInterface.textAreaCode.setText(m_instructions);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)br.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
+			tmpFileName += charset.charAt((int) (Math.random() * charset.length()));
 		}
 	}
-	
 	/* Ecrit dans le fichier temporaire */
 	private void writeTmpFile()
 	/** 
@@ -231,9 +169,9 @@ public class Script {
 	 */
 	{
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("src/ressources/"+m_tmpfile_name)));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("src/ressources/"+tmpFileName)));
 		
-			writer.write(m_tmpfile_content);
+			writer.write(tmpFileContent);
 			writer.close();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -261,5 +199,64 @@ public class Script {
 		tmpFileContentLayer = tmpFileContentLayer.replaceAll("tank.typeOfForwardObstacle\\(\\)", "tank.typeOfForwardObstacle(lineno())");
 		return tmpFileContentLayer;
 	}
+	
+	public void updateInstructions(String newInstructions)
+	/**
+     * Applique la surcouche au script Python
+     * @param newInstructions
+     */	
+	{
+		
+		instructions = newInstructions;
+		tmpFileContent= addLayer(instructions);
+		writeTmpFile();
+		Tank tmp = intelligence.getTankR().tankPhy;
+		intelligence = new Intelligence(filename, intelligence.getIntels(), tmp, this);
+		tmp.setIntelligence(intelligence);
+	
+	}
+	
+	private void importInstructionsFromFile(String path)
+	/**
+	 * chemin du script pour l'import de l'instruction
+     * @param path
+     */	
+	{
+		if (path == null)
+		{
+			instructions = "print \"Hello World !\"";
+			tmpFileContent = addLayer(instructions);
+			GraphicInterface.textAreaCode.setText(instructions);
+			return ;
+		}
+		BufferedReader br = null;
+		try {
+
+			String sCurrentLine;
+
+			br = new BufferedReader(new FileReader(path));
+
+			while ((sCurrentLine = br.readLine()) != null) {
+				instructions += sCurrentLine+'\n';
+				//tmpFileContent += "print str(inspect.currentframe().f_back.f_lineno)";
+				
+						tmpFileContent = addLayer(instructions);
+				
+			}
+			
+			
+			GraphicInterface.textAreaCode.setText(instructions);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
 	
 }

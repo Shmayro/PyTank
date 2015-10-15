@@ -16,8 +16,25 @@ import thinktank.javabot.physics.Physique;
 public class MainWindow extends JFrame{
 
 	private static PanneauDessin game;
-	private static JPanel container;
+
+//	private static JFileChooser chooser = new JFileChooser();
+	
+	public static MainWindow window = new MainWindow();
+	
+	/* Coordonnées saisies par le user */
+//	private static int setX;
+//	private static int setY;
+	
+	private static JPanel container;/* = new JPanel();*/
+//	private JPanel c2 = new JPanel();
+	
 	public static Physique phy;
+	
+	
+	public static JPanel getContainer()
+	{
+		return container;
+	}
 	
 	/**
 	 * Affichage principal de l'application
@@ -73,50 +90,67 @@ public class MainWindow extends JFrame{
 	
 	}
 	
-	public static PanneauDessin getPanneauDessin()
-	{
-		return game;
-	}
+	/**Graphics
+	 * Fonction main principale
+	 **/
+	public static void main(String args[]) {
+		
+		System.out.println("TEST");
+
+		// MAP HARD CODE
+		for(int i = 5; i < 10; i++)
+		{
+			MainWindow.phy.newMur(i,5);
 	
-	public static JPanel getContainer()
-	{
-		return container;
-	}
-	
-	/**
-	 * Ajoute un block de mur aux coordonées (x;y). Retourne true s'il n'y a 
-	 * pas eu d'erreur. Méthode verbeuse sur l'erreur.
-	 * 
-	 * @param x coordonnée sur les abscisses
-	 * @param y coordonnée sur les ordonnées
-	 * @return false s'il s'est produit une erreur
-	 */
-	public boolean addWall(int x, int y) {
-		if(x < 0 || y < 0) {
-			System.err.println("Error : impossible to add a wall at (" + x + "," + y + ")");
-			return false;
 		}
-		phy.newMur(x, y);
-		return true;
-	}
+		for(int i = 18; i < 25; i++)
+		{
+			MainWindow.phy.newMur(i,15);
 	
-	public void mainLoop() {
-		while (true) {
-			if (GraphicInterface.stoped != 1 || GraphicInterface.NextStepFlag) {
-				phy.iter();
-				/*
-				 * if(GraphicInterface.NextStepFlag)
-				 * GraphicInterface.NextStepFlag=false;
-				 */
+		}
+		for(int i = 5; i < 10 ; i++)
+		{
+			MainWindow.phy.newMur(30,i);
+	
+		}
+		for(int i = 28; i < 33; i++)
+		{
+			//window.phy.newMur(i,20);
+	
+		}
+		for(int i = 10; i < 15 ; i++)
+		{
+			MainWindow.phy.newMur(8,i);
+	
+		}
+		
+		System.out.println("TEST2");
+		
+		while(true){
+			
+			if(GraphicInterface.stoped != 1 || GraphicInterface.NextStepFlag){
+				MainWindow.phy.iter();
+				/*if(GraphicInterface.NextStepFlag)
+					GraphicInterface.NextStepFlag=false;*/
 			}
-			game.repaint();
+			MainWindow.game.repaint();
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
+			
 		}
+		
 	}
+	
+	public static PanneauDessin getPanneauDessin()
+	{
+		return game;
+	}
+
+
+
+
 
 }
