@@ -1,5 +1,10 @@
 package thinktank.javabot.graphics;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -8,6 +13,7 @@ import javax.swing.BoxLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import thinktank.javabot.physics.Physique;
 
@@ -41,19 +47,22 @@ public class MainWindow extends JFrame{
 	 **/
 
 	public MainWindow() {
-		int lx = 30;
-		int ly = 22;
-		phy = new Physique(lx, ly);
+		PanneauDessin.tailleCase=720/PanneauDessin.lx;
+		int x=PanneauDessin.tailleCase*PanneauDessin.lx,y=PanneauDessin.tailleCase*PanneauDessin.ly;
+		phy = new Physique(PanneauDessin.lx, PanneauDessin.ly);
 		game = new PanneauDessin(phy);
 		
+
+		
+		
 		this.setTitle("JavaBot");
-		this.setSize(740, 560);
+		this.setSize(x, y);
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
-		container = new JPanel();
+		container = new JPanel(new GridBagLayout());
         
-
+		
 		container.setLayout(new BoxLayout(container,BoxLayout.PAGE_AXIS));
 		
 
@@ -61,9 +70,8 @@ public class MainWindow extends JFrame{
 		container.add(game);
 		
 		
-		
 		this.setContentPane(container);
-		this.setResizable(false);
+		//this.setResizable(false);
 		this.setVisible(true); 
 		game.repaint();
 		
@@ -75,18 +83,21 @@ public class MainWindow extends JFrame{
 		GraphicInterface NewGame = new GraphicInterface();
 		//NewGame.lancement();
 		
-		
-		NewGame.jPanel5.add(container);
+
+		NewGame.jPanel5.add(container,BorderLayout.CENTER);
 		
 		//NewGame.setResizable(false);
 		
 		
 		//NewGame.jPanel5.add(c2);
 		NewGame.setVisible(true);
+		
 		Point p = NewGame.getLocationOnScreen();
 		System.out.println(p.getX());
 		System.out.println(p.getY());
 		this.setVisible(false); 
+		//System.out.println(NewGame.getX() +" "+NewGame.getY());
+		
 	
 	}
 	
@@ -96,14 +107,15 @@ public class MainWindow extends JFrame{
 	public static void main(String args[]) {
 		
 		System.out.println("TEST");
+		
 
-		// MAP HARD CODE
+		//MAP HARD CODE
 		for(int i = 5; i < 10; i++)
 		{
 			MainWindow.phy.newMur(i,5);
 	
 		}
-		for(int i = 18; i < 25; i++)
+		for(int i = 18; i < 23; i++)
 		{
 			MainWindow.phy.newMur(i,15);
 	
@@ -111,11 +123,6 @@ public class MainWindow extends JFrame{
 		for(int i = 5; i < 10 ; i++)
 		{
 			MainWindow.phy.newMur(30,i);
-	
-		}
-		for(int i = 28; i < 33; i++)
-		{
-			//window.phy.newMur(i,20);
 	
 		}
 		for(int i = 10; i < 15 ; i++)

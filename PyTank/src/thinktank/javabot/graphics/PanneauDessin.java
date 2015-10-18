@@ -22,8 +22,9 @@ import thinktank.javabot.physics.Tank;
 
 @SuppressWarnings("serial")
 public class PanneauDessin extends JPanel implements MouseListener {
-
-	private static int tailleCase = 24;
+	public static int lx = 30;
+	public static int ly = 22;
+	public static int tailleCase =20;
 	Physique physique;
 	ObjetTT contenu;
 	SpriteSet sp = new SpriteSet();
@@ -48,15 +49,15 @@ public class PanneauDessin extends JPanel implements MouseListener {
 	private void paintLifeStick(Graphics g, int x, int y, int vie)
 	{
 		g.setColor(Color.CYAN);
-		g.fillRect(x, y - 10, 24*vie/100, 5);
+		g.fillRect(x, y - 10, tailleCase*vie/100, 5);
 		g.setColor(Color.WHITE);
-		g.drawRect(x, y - 10, 24, 5);
+		g.drawRect(x, y - 10, tailleCase, 5);
 	}
 	
 	private void paintSelectedArea(Graphics g, int x, int y)
 	{
 		g.setColor(Color.blue);
-		g.drawRect(x - 15, y - 15, 50, 50);
+		g.drawRect(x - 15, y - 15, tailleCase+30, tailleCase+30);
 	}
 	
 	
@@ -157,14 +158,17 @@ public class PanneauDessin extends JPanel implements MouseListener {
     {     
 		g.setColor(Color.black);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		int lx = 42;
-		int ly = 24;
+		
 		
 		for(int i = 0; i < lx; i++){
 			for(int j = 0; j< ly; j++){
-				
 				int x = i * tailleCase;
 				int y = j * tailleCase;
+					if(GraphicInterface.jPanel5.getWidth()>PanneauDessin.lx*PanneauDessin.tailleCase || GraphicInterface.jPanel5.getHeight()>PanneauDessin.ly*PanneauDessin.tailleCase){
+						y+=(GraphicInterface.jPanel5.getHeight()-PanneauDessin.ly*PanneauDessin.tailleCase)/2;
+						x+=(GraphicInterface.jPanel5.getWidth()-PanneauDessin.lx*PanneauDessin.tailleCase)/2;
+					}
+						
 				
 				contenu = physique.detail(i, j);
 				

@@ -6,6 +6,8 @@
 package thinktank.javabot.graphics;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
+
 import javax.swing.JLabel;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.SwingConstants;
@@ -21,11 +23,14 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
@@ -88,9 +93,10 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
         GraphicInterface.gui = this;
         this.addWindowListener(this);
         this.addKeyListener(this);
-        setResizable(false);
 		this.setTitle("ThinkTank");
-      
+		
+		
+		
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -132,6 +138,7 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
     	GraphicInterface.gui.setFocusable(true);
 	    GraphicInterface.gui.requestFocusInWindow();
     }
+    
     /**
      * check Code Updates
      */    
@@ -235,6 +242,7 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
      * initComponents
      */
     private void initComponents() {
+    	this.setMinimumSize(new Dimension(1084, 636));
     	// sert a rien
         jLabel1 = new javax.swing.JLabel();
         jLabel1.setText("jLabel1");
@@ -248,8 +256,39 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
         jPanel5 = new javax.swing.JPanel();
         jPanel5.setPreferredSize(new Dimension(720, 520));
         jPanel5.setMinimumSize(new Dimension(720, 520));
-        jPanel5.setMaximumSize(new Dimension(720, 520));
-        jPanel5.setLayout(null);
+        //jPanel5.setMaximumSize(new Dimension(720, 520));
+        //jPanel5.setLayout(new GridBagLayout());
+        jPanel5.setLayout(new BorderLayout(0, 0));
+        jPanel5.addComponentListener(new ComponentListener() {
+			
+			@Override
+			public void componentShown(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+				PanneauDessin.tailleCase=jPanel5.getHeight()/PanneauDessin.ly;
+				if(GraphicInterface.jPanel5.getWidth()<PanneauDessin.lx*PanneauDessin.tailleCase)
+					PanneauDessin.tailleCase=jPanel5.getWidth()/PanneauDessin.lx;
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+
 
         // jPanel6: Panneau de droite de sélection des tanks
         jPanel6 = new JPanel();
@@ -262,6 +301,9 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
         jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane3.setTopComponent(jPanel5);        
         jSplitPane3.setRightComponent(jPanel6);
+        jSplitPane3.setResizeWeight(0.99999);
+        jSplitPane3.setEnabled( false );
+        
 
         // jSplitPane1: split Panneau de gauche
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -269,7 +311,7 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
     	//pane.setDividerLocation(0.0d);
         jSplitPane1.getRightComponent().setMinimumSize(new Dimension());
 
-    	//pane.setDividerLocation(1.0d);
+    	//pane.setDividerLocation(0.0d);
         jSplitPane1.setRightComponent(jSplitPane3);
         jSplitPane1.setLeftComponent(jPanel1);
         jSplitPane1.setEnabled( false );
@@ -336,7 +378,6 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
 				}
 				
 				TankChoice = "";
-				
 			
 			}
 			
@@ -511,6 +552,7 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
         final JButton btnDevMode = new JButton("Mode Dev");
         btnDevMode.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				if (GraphicInterface.devModeActivated == false) {
 	        		jSplitPane1.setDividerLocation(1.0d);
 	        		GraphicInterface.devModeActivated = true;
@@ -697,7 +739,7 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
 
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
-    public javax.swing.JPanel jPanel5;
+    public static javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     public javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane3;
@@ -706,7 +748,7 @@ public class GraphicInterface extends javax.swing.JFrame implements WindowListen
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
 	public void windowClosed(WindowEvent arg0) {
 	    /**
