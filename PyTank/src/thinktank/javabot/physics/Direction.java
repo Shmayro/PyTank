@@ -36,10 +36,8 @@ public class Direction {
 	 	* permet la rotation droite d'un mobile
 	 	*/
 		int tmp = dx;
-
-		dx = -dy; /*dx * 0 + dy * -1;*/
-		dy = tmp; /*tmp * 1 + dy * 0;*/ 
-
+		dx = dx*0 + dy*-1;
+		dy = tmp*1 + dy*0; 
 	}
 	
 	protected void tournerGauche()
@@ -48,10 +46,8 @@ public class Direction {
 	 	* permet la rotation gauche d'un mobile
 	 	*/
 		int tmp = dx;
-
-		dx = dy; /*dx * 0 + dy * 1;*/
-		dy = -tmp; /*tmp * -1 + dy * 0;*/ 
-
+		dx = dx*0 + dy*1;
+		dy = tmp*-1 + dy*0; 
 	}
 
 

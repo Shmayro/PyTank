@@ -1,11 +1,8 @@
 package thinktank.javabot.physics;
 
-import thinktank.javabot.intelligences.Action;
-
 
 public abstract class Mobile implements ObjetTT{
 	private static int idMob = 0;
-	public static int vitesseAvancement = 1;
 	private int id;
 	private int coordX;
 	private int coordY;
@@ -13,30 +10,10 @@ public abstract class Mobile implements ObjetTT{
 	private Direction direction;
 	private int latence = 0;
 	private boolean mort = false;
-	private int avancement = 0;
-	private Action deplacementStatus; 
-	/* Si il effectue un déplacement lors du tour courant */
-	
-	
-	public Action getDeplacementStatus()
-	{
-		return deplacementStatus;
-	}
-	
-	public void setDeplacementStatus(Action status)
-	{
-		deplacementStatus = status;
-	}
-	
-	public int getAvancement()
-	{
-		return avancement;
-	}
 	
 	public boolean getMort(){
 		return mort;
 	}
-	
 	
 	protected void meurt() {
 		mort = true;
@@ -46,38 +23,22 @@ public abstract class Mobile implements ObjetTT{
 		return latence;
 	}
 	
-	protected void decAvancement(int valDec)
-	{
-		avancement -= valDec;
-	}
-	
-	protected void incAvancement(int valDec)
-	{
-		avancement += valDec;
-	}
-	
-	protected void initAvancement(int val)
-	{
-		avancement = val;
-	}
-	
 	protected void setLatence(int latence) {
 		this.latence = latence;
 	}
 	protected int newId(){
-		/*idMob++;
-		return idMob-1;*/
-		return idMob++;
+		idMob++;
+		return idMob-1;
 	}
 	
-	protected int avancer()
+	protected void avancer()
 	/**
  	* permet le mouvement dans le sens de la direction
  	*/
 	{
 		int old_x = coordX, old_y = coordY;
-		int val_ret = map.TestAndSetCase(this,coordX + direction.getDx(),coordY + direction.getDy());
-		if( val_ret != -2)
+		
+		if( map.TestAndSetCase(this,coordX + direction.getDx(),coordY + direction.getDy()))
 		{
 			coordX = coordX + direction.getDx();
 			coordY = coordY + direction.getDy();
@@ -85,24 +46,23 @@ public abstract class Mobile implements ObjetTT{
 
 		}
 		//System.out.println("type: "+getType()+" id:"+getId()+" newX: "+coordX+" newY: "+coordY);
-		return val_ret;
+
 	}
 	
-	protected int reculer()
+	protected void reculer()
 	/**
- 	* permet le mouvement dans le sens contraire de la direction
+ 	* permet le mouvement dans le sens de la direction
  	*/
 	{
 		int old_x = coordX, old_y = coordY;
-		int val_ret = map.TestAndSetCase(this,coordX - direction.getDx(),coordY - direction.getDy());
-		if( val_ret != -2)
+		
+		if( map.TestAndSetCase(this,coordX - direction.getDx(),coordY - direction.getDy()))
 		{
 			coordX = coordX -direction.getDx();
 			coordY = coordY - direction.getDy();
 			map.erase(old_x,old_y);
 
 		}
-		return val_ret;
 		//System.out.println("type: "+getType()+" id:"+getId()+" newX: "+coordX+" newY: "+coordY);
 
 	}
@@ -133,7 +93,7 @@ public abstract class Mobile implements ObjetTT{
 		return coordX;
 	}
 
-	protected void setCoordX(int coordX) 
+	public void setCoordX(int coordX) 
 	/**
  	* met à jours la coordonnée en absyss
 	* @param coordX nouvelle coordonnée en absyss
@@ -150,7 +110,7 @@ public abstract class Mobile implements ObjetTT{
 		return coordY;
 	}
 
-	protected void setCoordY(int coordy)
+	public void setCoordY(int coordy)
 	/**
  	* met à jours la coordonnée en absyss
 	* @param coordY nouvelle coordonnée en ordonnée

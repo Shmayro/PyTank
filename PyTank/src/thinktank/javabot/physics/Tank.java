@@ -1,10 +1,8 @@
 package thinktank.javabot.physics;
 
+import java.awt.Graphics;
 import java.util.Random;
 
-import com.ziclix.python.sql.handler.UpdateCountDataHandler;
-
-import thinktank.javabot.graphics.GraphicInterface;
 import thinktank.javabot.intelligences.Action;
 import thinktank.javabot.intelligences.Intelligence;
 import thinktank.javabot.intelligences.Intelligences;
@@ -18,11 +16,14 @@ public class Tank extends Mobile {
 	private Intelligence ia;
 	private static Intelligences intels = new Intelligences();
 	private Sensors sensor;
-	public String tc;
-	
+	private String filepath;
 
 	public Sensors getSensor() {
 		return sensor;
+	}
+	
+	public String getScript(){
+		return filepath;
 	}
 
 	public void setSensor(Sensors sensor) {
@@ -32,10 +33,7 @@ public class Tank extends Mobile {
 	public static Intelligences getIntels() {
 		return intels;
 	}
-	public Intelligence getIntel()
-	{
-		return ia;
-	}
+
 	private int Alea(int valeurMin, int valeurMax) 
 	/**
  	* renvoie un nombre entre borne inférieure et borne supérieure
@@ -52,6 +50,7 @@ public class Tank extends Mobile {
 		setCoordX(Alea(1, map.tailleX() - 1));
 		setCoordY(Alea(1, map.tailleY() - 1));
 
+		//TODO a enlever ! Implémentation dégleusse - Pacôme
 		while (!map.estLibre(getCoordX(), getCoordY())) {
 			setCoordX(Alea(1, map.tailleX() - 1));
 			setCoordY(Alea(1, map.tailleY() - 1));
@@ -61,26 +60,22 @@ public class Tank extends Mobile {
 		setArme(arme);
 		setMap(map);
 		setDirection(new Direction(0, 1));
-		ia = intels.newIntelligence("src/ressources/tank1.py",this);
+		ia = intels.newIntelligence("ressources/tank1.py",this);
 		ia.initialize();
 	}
 	
-	public void setIntelligence(Intelligence i)
-	{
-		ia = i;
-		ia.start();
-	}
-	
 	protected Tank(Terrain map, String filepath) {
+		if(map == null ) return;
+		
 		setId(newId());
 		setCoordX(Alea(1, map.tailleX() - 1));
 		setCoordY(Alea(1, map.tailleY() - 1));
 
+		//TODO a enlever ! Implémentation dégleusse - Pacôme
 		while (!map.estLibre(getCoordX(), getCoordY())) {
 			setCoordX(Alea(1, map.tailleX() - 1));
 			setCoordY(Alea(1, map.tailleY() - 1));
 		}
-		
 
 		arme = new Arme();
 		setArme(arme);
@@ -88,11 +83,12 @@ public class Tank extends Mobile {
 		setDirection(new Direction(0, 1));
 		ia = intels.newIntelligence(filepath,this);
 		ia.initialize();
+		this.filepath = filepath;
 	}
 
-	protected Tank(int x, int y, Terrain map,String tc) {
+	protected Tank(int x, int y, Terrain map) {
 		setId(newId());
-		this.tc=tc;
+
 		setCoordX(x);
 		setCoordY(y);
 
@@ -100,14 +96,14 @@ public class Tank extends Mobile {
 		setArme(arme);
 		setMap(map);
 		setDirection(new Direction(0, 1));
-		ia = intels.newIntelligence("src/ressources/tank1.py",this);
+		ia = intels.newIntelligence("ressources/tank1.py",this);
 		ia.initialize();
 		
 	}
 	
-	protected Tank(int x, int y, Terrain map,String filepath, Physique physique,String tc) {
+	protected Tank(int x, int y, Terrain map,String filepath, Physique physique) {
 		setId(newId());
-		this.tc=tc;
+
 		setCoordX(x);
 		setCoordY(y);
 
@@ -151,15 +147,16 @@ public class Tank extends Mobile {
  	*/
 	{
 		if (getMap().estLibre(getCoordX() + getDirection().getDx(),
-				getCoordY() + getDirection().getDy())) {
+				getCoordY() + getDirection().getDy())
+				&& arme.getTempsRestant() <= 0) {
 			Direction d = new Direction(getDirection().getDx(), getDirection().getDy());
 			Projectile p = arme.creerProjectile(getCoordX()
 					+ getDirection().getDx(), getCoordY()
 					+ getDirection().getDy(), d, getMap());
-
-			getMap().setProjectile(p);
-
-		} 
+			getMap().addProjectile(p);
+			arme.initTempsRestant();
+		} else
+			arme.reduireTempsRestant();
 	}
 
 	public int getPointsDeVie() 
@@ -192,22 +189,9 @@ public class Tank extends Mobile {
 	}
 
 	protected void tuer() {
-		
 		getMap().erase(getCoordX(), getCoordY());
 		meurt();
-		
-		if (GraphicInterface.getSelectedTank() == this)
-			GraphicInterface.setSelectedTank(null);
 		getMap().removeTank(this);
-		
-		if (GraphicInterface.getSelectedTank() == null)
-		{
-			System.out.println("UPDATE");
-			GraphicInterface.updateListTanksOnMap();
-			
-
-			
-		}
 	}
 
 	protected void action(Action act) 
@@ -216,7 +200,6 @@ public class Tank extends Mobile {
 	* @param act  action donnée par l'IA
  	*/
 	{
-		System.out.println("Action "+act);
 		if (getLatence() > 0) {
 			setLatence(getLatence() - 1);
 			return;
@@ -227,20 +210,12 @@ public class Tank extends Mobile {
 
 		switch (act) {
 		case moveForward:
-			if (avancer() != -2) /*Si le mobile peut avancer */
-			{
-				setDeplacementStatus(Action.moveForward);
-				initAvancement(100);
-			}
+			avancer();
 			setLatence(0);
 			break;
 
 		case moveBackward:
-			if (reculer() != -2) /*Si le mobile peut reculer */
-			{
-				setDeplacementStatus(Action.moveBackward);
-				initAvancement(-100);
-			}
+			reculer();
 			setLatence(0);
 			break;
 
@@ -251,15 +226,11 @@ public class Tank extends Mobile {
 
 		case turnClockwise:
 			getDirection().tournerDroite();
-			setDeplacementStatus(Action.turnClockwise);
-			initAvancement(100);
 			setLatence(0);
 			break;
 
 		case turnCounterClockwise:
 			getDirection().tournerGauche();
-			setDeplacementStatus(Action.turnCounterClockwise);
-			initAvancement(100);
 			setLatence(0);
 			break;
 
@@ -285,6 +256,28 @@ public class Tank extends Mobile {
 			setLatence(getLatence() - 1);
 			return;
 		}
+//		switch (i%3) { test sans ia
+//		case 0:
+//			action(Physique.action.tournerGauche);
+//			break;
+//		case 1:
+//			action(Physique.action.tirer);
+//			break;
+//		case 2:
+//			action(Physique.action.avancer);
+//			break;
+//
+//		default:
+//			break;
+//		}
+//		i++;
+		
+//		ia.computeAction();
+//		try {
+//			Thread.sleep(100);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		
 		if(ia.getAction() != null){
 			act = ia.getAction();
@@ -294,7 +287,10 @@ public class Tank extends Mobile {
 		action(act);
 	}
 
-
-
+	@Override
+	public void paint(Graphics g, int x, int y) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

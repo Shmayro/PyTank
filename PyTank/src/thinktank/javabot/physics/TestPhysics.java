@@ -29,14 +29,14 @@ public class TestPhysics {
 	}
 	
 	public static void testProjectile(){
-		Physique physique = new Physique(10, 10);
+		Physique physique = new Physique();
 		Terrain map = physique.getMap();
-		Tank t = map.addTank(1,8,"src/ressources/tank1.py",physique);
+		Tank t = map.addTank(1,8,"ressources/tank1.py",physique);
 		t.getDirection().tournerDroite();
 		t.getDirection().tournerDroite();
-		physique.addTank(1,1,"src/ressources/tank1.py");
-		physique.addTank(2,1,"src/ressources/tank1.py");
-		physique.addTank(3,1,"src/ressources/tank1.py");
+		physique.addTank(1,1,"ressources/tank1.py");
+		physique.addTank(2,1,"ressources/tank1.py");
+		physique.addTank(3,1,"ressources/tank1.py");
 		affiche(physique);
 		while(true){
 			physique.iter();
@@ -47,10 +47,10 @@ public class TestPhysics {
 	
 	
 	public static void test(){
-		Physique physique = new Physique(10, 10);
+		Physique physique = new Physique();
 		Terrain map = physique.getMap();
-		map.addTank("src/ressources/tankytourne2.py");
-		map.addTank("src/ressources/tankytourne2.py");
+		map.addTank("ressources/tankytourne2.py");
+		map.addTank("ressources/tankytourne2.py");
 		affiche(physique);
 		while(true){
 			physique.iter();
@@ -59,7 +59,7 @@ public class TestPhysics {
 		}
 	}
 	
-	public static void main(String[] args) throws InterruptedException {
+	/*public static void main(String[] args) throws InterruptedException {
 		test();
-	}
+	}*/
 }

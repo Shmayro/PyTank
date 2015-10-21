@@ -21,7 +21,7 @@ public class tests {
 		
 		Intelligence intel[] = new Intelligence[nbIntels];
 		for(int i=0;i<nbIntels;i++){
-			intel[i]=intels.newIntelligence("src/ressources/tankytourne.py",null);
+			intel[i]=intels.newIntelligence("ressources/tankytourne.py",null);
 			intel[i].initialize();
 		}
 		

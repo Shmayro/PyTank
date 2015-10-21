@@ -1,9 +1,6 @@
 package thinktank.javabot.intelligences;
-import java.io.IOException;
-
 import org.python.util.PythonInterpreter;
 
-import thinktank.javabot.graphics.GraphicInterface;
 import thinktank.javabot.physics.Tank;
 
 // TODO: Auto-generated Javadoc
@@ -30,33 +27,18 @@ public class Intelligence extends Thread {
 	/** The is initialized. */
 	private boolean isInitialized = false; //Verrou d'initialisation.
 	
-	private Script script;
-	
-	private PythonInterpreter interp;
-	
 	/**
 	 *  Reprend le script python pour calculer une nouvelle action à effectuer. (Fonction non bloquante.)
 	 * */
 	public void computeAction()
 	{
 		if(action == Action.scriptCompleted || action == Action.scriptTerminated)
-		{
 			return;
-		}
+		
 		this.setRunning();
 		
 		this.action = Action.noAction;
 		tankR.unlock();
-	}
-	
-	public Intelligences getIntels()
-	{
-		return intelligences;
-	}
-	
-	public TankRemote getTankR()
-	{
-		return tankR;
 	}
 	
 	/**
@@ -91,12 +73,6 @@ public class Intelligence extends Thread {
 		return action;
 	}
 	
-	
-	public Script getScript()
-	{
-		return script;
-	}
-	
 	/**
 	 * Fonction interne au package. Permet au script python, via un objet TankRemote, de stoquer l'action à effectuer.
 	 *
@@ -118,7 +94,7 @@ public class Intelligence extends Thread {
 	Intelligence(String filepath, Intelligences intelligences)
 	{
 		this.tankR = new TankRemote(this,null);
-		this.setFilepath(filepath);
+		this.filepath = filepath;
 		this.intelligences = intelligences;
 	}
 	
@@ -130,16 +106,8 @@ public class Intelligence extends Thread {
 	 *  */
 	Intelligence(String filepath, Intelligences intelligences, Tank tankPhy){
 		this.tankR = new TankRemote(this,tankPhy);
-		this.setFilepath(filepath);
+		this.filepath = filepath;
 		this.intelligences = intelligences;
-		script = new Script(filepath, this);
-	}
-	
-	Intelligence(String filepath, Intelligences intelligences, Tank tankPhy, Script script){
-		this.tankR = new TankRemote(this,tankPhy);
-		this.setFilepath(filepath);
-		this.intelligences = intelligences;
-		this.script = script;
 	}
 	
 	/**
@@ -192,57 +160,21 @@ public class Intelligence extends Thread {
 		this.setAction(Action.scriptTerminated);
 	}
 	
-	public void initInterpreter()
-	{
-		interp = new PythonInterpreter();
-		
-		interp.setOut(GraphicInterface.outPut);
-		//interp.setOut(System.out);
-		interp.exec("import sys");
-		interp.exec("import inspect");
-		interp.exec("def lineno():\n\treturn inspect.currentframe().f_back.f_lineno");
-		//interp.exec("print sys");
-		interp.set("tank", tankR);
-		tankR.bePrepared();
-	}
-	
-	public void execInterpreter()
-	{
-		interp.execfile("src/ressources/"+script.getTmpFileName());
-		setAction(Action.scriptCompleted);
-	}
-	
 	/**
 	 *  Thread dédié à l'interpréteur python pour l'IA utilisateur. */
 	public void run()
 	{
 		this.setRunning();
-		initInterpreter();
+		PythonInterpreter interp = new PythonInterpreter();
+		interp.setOut(System.out);
+		interp.exec("import sys");
+		interp.exec("print sys");
+		interp.set("tank", tankR);
 		setInitialized();
-		
-		try
-		{
-			execInterpreter();
-		}
-		catch (Exception e)
-		{
-			try {
-				GraphicInterface.outPut.write("Erreur dans le script\n");
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+		tankR.bePrepared();
+		interp.execfile(filepath);
+		setAction(Action.scriptCompleted);
 		this.noMoreRunning();
 		
-		interp.close();
-	}
-
-	public String getFilepath() {
-		return filepath;
-	}
-
-	public void setFilepath(String filepath) {
-		this.filepath = filepath;
 	}
 }

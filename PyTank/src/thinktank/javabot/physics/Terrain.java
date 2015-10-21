@@ -2,18 +2,14 @@ package thinktank.javabot.physics;
 
 import java.util.ArrayList;
 
-import thinktank.javabot.graphics.GraphicInterface;
-
 
 public class Terrain {
 	
 	private ObjetTT terrain[][];
 	private ArrayList<Tank> tanks = new ArrayList<Tank>();
-	/*private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();*/
-	/* Un seul projectile à la fois sur le terrain !*/
-	private Projectile projectile;
+	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private int x, y;
-	private boolean affichageOn = true;
+	private boolean affichageOn = false;
 	
 	public boolean isAffichageOn() {
 		return affichageOn;
@@ -52,7 +48,7 @@ public class Terrain {
 		return terrain;
 	}
 	
-	protected ObjetTT detail (int x, int y)
+	public ObjetTT detail (int x, int y)
 	/**
  	* renvoie l'objet sur la case de coordonnée (x,y)
 	* @param x  absyss
@@ -72,19 +68,14 @@ public class Terrain {
 		return tanks;
 	}
 	
-	public Projectile getProjectile()
-	{
-		return projectile;
-	}
-	/*
 	public ArrayList<Projectile> getProjectiles()
 	/**
  	* renvoie la liste des projectiles
- 	
+ 	*/
 	{
 		return projectiles;
 	}
-*/
+
 	
 	protected Tank addTank()
 	/**
@@ -95,6 +86,18 @@ public class Terrain {
 		tanks.add(t);
 		addObjetTT(t.getCoordX(), t.getCoordY(), t);
 		return t;
+	}
+	
+	protected Tank addTank(Tank tank)
+	/**
+ 	* rajoute un tank au Terrain, ainsi qu'a la liste des tanks
+ 	*/
+	{
+		if( ! estLibre(tank.getCoordX(), tank.getCoordY() ) ) return null;
+		tanks.add(tank);
+		tank.setMap(this);
+		addObjetTT(tank.getCoordX(), tank.getCoordY(), tank);
+		return tank;
 	}
 	
 	protected Tank addTank(String filepath)
@@ -117,7 +120,7 @@ public class Terrain {
  	* @param y  ordonnée
  	*/
 	{
-		Tank t = new Tank(x,y,this,filepath,physique,GraphicInterface.TankChoice);
+		Tank t =new Tank(x,y,this,filepath,physique);
 		tanks.add(t);
 		addObjetTT(t.getCoordX(), t.getCoordY(), t);
 		return t;
@@ -143,11 +146,9 @@ public class Terrain {
 			if(t.getId() == id)
 				return t;
 
-		/*for(Projectile p : projectiles)
+		for(Projectile p : projectiles)
 			if(p.getId() == id)
-				return p;*/
-		if (projectile.getId() == id)
-			return projectile;
+				return p;
 		return null;
 	}
 
@@ -170,41 +171,34 @@ public class Terrain {
 	* @param id  identifiant d'un Projectile
  	*/
 	{
-		/*for(Projectile p : projectiles)
+		for(Projectile p : projectiles)
 			if(p.getId() == id)
-				return p;*/
-		if (projectile.getId() == id)
-			return projectile;
+				return p;
 		return null;
 	}
-/*
+
 	protected void addProjectile(Projectile proj)
-	**
+	/**
  	* ajoute un Projectile à la liste des Projectiles
 	* @param proj  Projectile à ajouter à la liste des Projectiles
- 	*
+ 	*/
 	{
 		projectiles.add(proj);
 		addObjetTT(proj.getCoordX(), proj.getCoordY(), proj);
 		
 	}
-*/
-	protected void setProjectile(Projectile proj)
-	{
-		projectile = proj;
-	}
+
 	protected void removeProjectile(Projectile proj)
 	/**
  	* enleve un Projectile à la liste des Projectiles
 	* @param proj  Projectile à enlever de la liste des Projectiles
  	*/
 	{
-		/*projectiles.remove(proj);*/
-		projectile = null;
+		projectiles.remove(proj);
 	}
 
 
-	protected boolean estLibre(int x, int y)
+	public boolean estLibre(int x, int y)
 	/**
  	* renvoie true si la case(x,y) contient un Vide, sinon renvoie false
 	* @param x   absyss
@@ -237,7 +231,7 @@ public class Terrain {
 	* @param y  ordonnée
  	*/
 	{
-		if(x <= terrain.length && y <= terrain[x].length){
+		if(x < terrain.length && y < terrain[x].length){
 			if(terrain[x][y] == Mur.getMur())
 				return Physique.type.mur;
 			if(terrain[x][y] == Vide.getVide())
@@ -248,13 +242,7 @@ public class Terrain {
 			return Physique.type.mur;
 	}
 
-	
-/* Valeur de retour: 
- *  -2: Deplacement impossible
- *  -1: Deplacement possible
- *  >= 0: Pour les projectiles uniquement: indice du mobile rencontré.	
- */
-	protected int TestAndSetCase(Mobile mob,int newX, int newY)
+	public boolean TestAndSetCase(Mobile mob,int newX, int newY)
 	{
 		
 		int x = mob.getCoordX();
@@ -264,14 +252,14 @@ public class Terrain {
 		if(estLibre(newX, newY)){
 			erase(x,y);
 			terrain[newX][newY] = mob;
-			return -1;
+			return true;
 		}
 		if(mob.getType() == Physique.type.projectile){
 			if(caseContent(newX,newY) == Physique.type.mur ){ // un mur
 				mob.tuer();
-				return -1;
+				return true;
 			}
-		/*	if(caseContent(newX, newY) == Physique.type.projectile)
+			if(caseContent(newX, newY) == Physique.type.projectile)
 			{
 				Projectile p =((Projectile) detail(newX, newY));
 				mob.tuer();
@@ -279,18 +267,17 @@ public class Terrain {
 				p.tuer();
 				return true;
 			}
-			*/
+			
 			if(caseContent(newX, newY) == Physique.type.tank)
 			{
 				mob.tuer();
-				Tank t = (Tank)detail(newX, newY);
-				t.Subit(((Projectile)mob).getDegatsProjectile());
-				return t.getId();
+				((Tank) detail(newX, newY)).Subit(((Projectile)mob).getDegatsProjectile());
+				return true;
 			}
 
 		}
 		
-	/*	if(mob.getType() == Physique.type.tank){
+		if(mob.getType() == Physique.type.tank){
 			if(caseContent(newX, newY) == Physique.type.projectile)
 			{
 				((Tank) mob).Subit(((Projectile)detail(newX, newY)).getDegatsProjectile());
@@ -298,11 +285,11 @@ public class Terrain {
 				return true;
 			}
 		}
-	*/	
-		return -2;
+		
+		return false;
 	}
 
-	protected void erase(int x, int y)
+	public void erase(int x, int y)
 	/**
  	* enleve du Terrain l'objet en (x,y)
 	* @param x  absyss
@@ -320,6 +307,7 @@ public class Terrain {
 	* @param obj  objet à ajouter
  	*/
 	{
+		// TODO il faut vérifier ici si les coordonées de l'objet sont libres... Pas avant !
 		terrain[x][y] = obj;
 	}
 	

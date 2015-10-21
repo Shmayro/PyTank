@@ -1,163 +1,146 @@
 package thinktank.javabot.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 
 import javax.swing.BoxLayout;
-
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
+import javax.swing.JTextField;
 
 import thinktank.javabot.physics.Physique;
 
 
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame{
-
-	private static PanneauDessin game;
-
-//	private static JFileChooser chooser = new JFileChooser();
+public class MainWindow extends JFrame {
+	private PanneauDessin game;
+	private static JButton editer = new JButton("AJOUTER TANK");
+	private static JTextField inputX = new JTextField(); 
+	private static JTextField inputY = new JTextField();
 	
-	public static MainWindow window = new MainWindow();
+	private static JLabel labelX = new JLabel("  X : ");
+	private static JLabel labelY = new JLabel("  Y : ");
 	
 	/* Coordonnées saisies par le user */
-//	private static int setX;
-//	private static int setY;
+	//private static int setX;
+	//private static int setY;
 	
-	private static JPanel container;/* = new JPanel();*/
-//	private JPanel c2 = new JPanel();
+	private JPanel container = new JPanel();
+	private JPanel c2 = new JPanel();
 	
-	public static Physique phy;
+	private static Physique phy;
 	
-	
-	public static JPanel getContainer()
-	{
-		return container;
-	}
 	
 	/**
 	 * Affichage principal de l'application
 	 **/
-
 	public MainWindow() {
-		PanneauDessin.tailleCase=720/PanneauDessin.lx;
-		int x=PanneauDessin.tailleCase*PanneauDessin.lx,y=PanneauDessin.tailleCase*PanneauDessin.ly;
-		phy = new Physique(PanneauDessin.lx, PanneauDessin.ly);
+		
+		
+		phy = new Physique();
 		game = new PanneauDessin(phy);
 		
-
-		
-		
 		this.setTitle("JavaBot");
-		this.setSize(x, y);
+		this.setSize(1008, 634);
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
-		container = new JPanel(new GridBagLayout());
+	
+		inputX.setMaximumSize(new Dimension(Integer.MAX_VALUE, inputX.getMinimumSize().height));
+        add(inputX);
+        inputY.setMaximumSize(new Dimension(Integer.MAX_VALUE, inputY.getMinimumSize().height));
+        add(inputY);
         
-		
+
 		container.setLayout(new BoxLayout(container,BoxLayout.PAGE_AXIS));
 		
 
+		c2.setLayout(new BoxLayout(c2, BoxLayout.LINE_AXIS));
+		c2.add(editer);
+		
+		c2.add(labelX);
+		c2.add(inputX);
+		
+		c2.add(labelY);
+		c2.add(inputY);
+		c2.setSize(25, 25);
 		
 		container.add(game);
-		
+		container.add(c2);
+
 		
 		this.setContentPane(container);
-		//this.setResizable(false);
+		this.setResizable(true);
 		this.setVisible(true); 
+		
 		game.repaint();
-		
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		GraphicInterface NewGame = new GraphicInterface();
-		//NewGame.lancement();
-		
-
-		NewGame.jPanel5.add(container,BorderLayout.CENTER);
-		
-		//NewGame.setResizable(false);
-		
-		
-		//NewGame.jPanel5.add(c2);
-		NewGame.setVisible(true);
-		
-		Point p = NewGame.getLocationOnScreen();
-		System.out.println(p.getX());
-		System.out.println(p.getY());
-		this.setVisible(false); 
-		//System.out.println(NewGame.getX() +" "+NewGame.getY());
-		
 	
 	}
 	
 	/**Graphics
 	 * Fonction main principale
-	 **/
+	 **/ /*
 	public static void main(String args[]) {
+		final MainWindow window = new MainWindow();
 		
-		System.out.println("TEST");
-		
-
-		//MAP HARD CODE
+		// MAP HARD CODE
 		for(int i = 5; i < 10; i++)
 		{
-			MainWindow.phy.newMur(i,5);
+			window.phy.newMur(i,5);
 	
 		}
-		for(int i = 18; i < 23; i++)
+		for(int i = 18; i < 25; i++)
 		{
-			MainWindow.phy.newMur(i,15);
+			window.phy.newMur(i,15);
 	
 		}
 		for(int i = 5; i < 10 ; i++)
 		{
-			MainWindow.phy.newMur(30,i);
+			window.phy.newMur(30,i);
+	
+		}
+		for(int i = 28; i < 33; i++)
+		{
+			window.phy.newMur(i,20);
 	
 		}
 		for(int i = 10; i < 15 ; i++)
 		{
-			MainWindow.phy.newMur(8,i);
+			window.phy.newMur(8,i);
 	
 		}
 		
-		System.out.println("TEST2");
+		
+		editer.addActionListener(new ActionListener()
+		{
+	         
+		    @Override
+		    public void actionPerformed(ActionEvent e)
+		    {
+		         
+		    	JFileChooser chooser = new JFileChooser();
+		        int returnVal = chooser.showOpenDialog(null);
+		        if(returnVal == JFileChooser.APPROVE_OPTION) {
+		           System.out.println("You chose to open this file: " +
+		                chooser.getSelectedFile().getName());
+		       
+		        }
+		        
+		        setX = Integer.valueOf(inputX.getText());
+		        setY = Integer.valueOf(inputY.getText());
+		        
+		        window.phy.addTank(setX, setY,"ressources/"+chooser.getSelectedFile().getName());
+		    }
+		});
 		
 		while(true){
 			
-			if(GraphicInterface.stoped != 1 || GraphicInterface.NextStepFlag){
-				MainWindow.phy.iter();
-				/*if(GraphicInterface.NextStepFlag)
-					GraphicInterface.NextStepFlag=false;*/
-			}
-			MainWindow.game.repaint();
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			window.phy.iter();
+			window.game.repaint();
 			
 		}
 		
-	}
-	
-	public static PanneauDessin getPanneauDessin()
-	{
-		return game;
-	}
-
-
-
-
+	}*/
 
 }

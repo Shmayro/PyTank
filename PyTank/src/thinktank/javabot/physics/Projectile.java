@@ -1,11 +1,18 @@
 package thinktank.javabot.physics;
 
+import java.awt.Graphics;
+import java.awt.Image;
+
+import thinktank.javabot.graphics.GraphicArena;
+import thinktank.javabot.graphics.ImageLoader;
+
 public class Projectile extends Mobile{
 
 	private int degatsProjectile = 20;
 	private int vitesseProjectile = 0; // nombre d'iter a attendre avant d'avancer
 	private static int idMort = -1;
-	
+	private Image sprite;
+	private Image background_sprite;
 	
 	
 	protected static int getIdMort() {
@@ -27,6 +34,8 @@ public class Projectile extends Mobile{
 		setCoordX(x);
 		setCoordY(y);
 		setDirection(direction);
+		sprite = GraphicArena.imgLoader.getSprite(ImageLoader.SpriteName.MISSILE.ordinal());
+		background_sprite = GraphicArena.imgLoader.getSprite(ImageLoader.SpriteName.SOL.ordinal());
 	}
 	
 	protected Projectile(int x, int y, Direction direction, Terrain map, int dmg, int vitesse)
@@ -39,21 +48,18 @@ public class Projectile extends Mobile{
 		setDegatsProjectile(dmg);
 	}
 	
-	protected int avancer(){
+	protected void avancer(){
 		if (getLatence() > 0) {
 			setLatence(getLatence() - 1);
-			return -1;
+			return;
 		}
 		int x = getCoordX();
 		int y = getCoordY();
-		int val_ret = super.avancer();
+		super.avancer();
 		if(x != getCoordX() || y!= getCoordY())
 			setLatence(vitesseProjectile);
-		return val_ret;
 	}
 	
-	
-
 
 	public int getDegatsProjectile() 
 	/**
@@ -85,6 +91,13 @@ public class Projectile extends Mobile{
 		getMap().erase(getCoordX(),getCoordY());
 		meurt();
 		getMap().removeProjectile(this);
+	}
+
+	@Override
+	public void paint(Graphics g, int x, int y) {
+		g.drawImage(background_sprite, x, y, null);
+		g.drawImage(sprite, x, y, null);
+		
 	}
 	
 }

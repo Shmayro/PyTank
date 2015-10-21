@@ -75,54 +75,48 @@ public class TankRemote {
 	/**
 	 * Do nothing.
 	 */
-	public void doNothing(int lineno){
+	public void doNothing(){
 		ia.setAction(Action.noAction);
-		ia.getScript().setCurrentLine(lineno);
 		bePrepared();
 }
 	
 	/**
 	 * Move forward.
 	 */
-	public void moveForward(int lineno){
+	public void moveForward(){
 			ia.setAction(Action.moveForward);
-			ia.getScript().setCurrentLine(lineno);
 			bePrepared();
 	}
 	
 	/**
 	 * Move backward.
 	 */
-	public void moveBackward(int lineno){
+	public void moveBackward(){
 		ia.setAction(Action.moveBackward);
-		ia.getScript().setCurrentLine(lineno);
 		bePrepared();
 	}
 	
 	/**
 	 * Turn clockwise.
 	 */
-	public void turnClockwise(int lineno){
+	public void turnClockwise(){
 		ia.setAction(Action.turnClockwise);
-		ia.getScript().setCurrentLine(lineno);
 		bePrepared();
 	}
 	
 	/**
 	 * Turn counter clockwise.
 	 */
-	public void turnCounterClockwise(int lineno){
+	public void turnCounterClockwise(){
 		ia.setAction(Action.turnCounterClockwise);
-		ia.getScript().setCurrentLine(lineno);
 		bePrepared();
 	}
 	
 	/**
 	 * Shoot.
 	 */
-	public void shoot(int lineno){
+	public void shoot(){
 		ia.setAction(Action.shoot);
-		ia.getScript().setCurrentLine(lineno);
 		bePrepared();
 	}
 	
@@ -131,26 +125,24 @@ public class TankRemote {
 	 *
 	 * @return the int
 	 */
-	public int radar(int lineno){
-		ia.getScript().setCurrentLine(lineno);
+	public int radar(){
 		return 42;
 	}
 	
 	/**
 	 * Look forward.
 	 *
-	 * @return the intregex
+	 * @return the int
 	 */
-	public int distanceOfForwardObstacle(int lineno){
+	public int distanceOfForwardObstacle(){
 		DetectionLigneDroite dld = ((DetectionLigneDroite) tankPhy.getSensor());
-		ia.getScript().setCurrentLine(lineno);
+		
 		return  dld.detection().getDistance();
 	}
 	
 	
-	public Physique.type typeOfForwardObstacle(int lineno){
+	public Physique.type typeOfForwardObstacle(){
 		DetectionLigneDroite dld = ((DetectionLigneDroite) tankPhy.getSensor());
-		ia.getScript().setCurrentLine(lineno);
 		return  dld.detection().getType();
 	}
 	

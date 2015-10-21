@@ -1,9 +1,18 @@
 package thinktank.javabot.physics;
 
-public class Mur implements ObjetTT{
-	final static Mur m = new Mur();
+import java.awt.Graphics;
+import java.awt.Image;
 
-	private Mur(){}
+import thinktank.javabot.graphics.GraphicArena;
+import thinktank.javabot.graphics.ImageLoader;
+
+public class Mur implements ObjetTT{
+	final static Mur m = new Mur(GraphicArena.imgLoader);
+	Image sprite;
+
+	public Mur(ImageLoader img){
+		sprite = img.getSprite(ImageLoader.SpriteName.MUR.ordinal());
+	}
 
 	public static Mur getMur()
 	/**
@@ -19,5 +28,8 @@ public class Mur implements ObjetTT{
  	*/
 	{
 		return Physique.type.mur;
+	}
+	public void paint(Graphics g, int x, int y){
+		g.drawImage(sprite, x, y, null);
 	}
 }

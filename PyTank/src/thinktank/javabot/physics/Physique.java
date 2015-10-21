@@ -1,12 +1,15 @@
 package thinktank.javabot.physics;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import thinktank.javabot.graphics.GraphicInterface;
-import thinktank.javabot.intelligences.Action;
+
+
 
 public class Physique {
+	
+	private Terrain map;
+	private int lignes = 42;
+	private int colonnes = 24;
 	
 	public enum type{
 		tank,
@@ -14,10 +17,14 @@ public class Physique {
 		projectile,
 		mur
 	}
-
-	private int tour = 0;
-	private Terrain map;
-
+	
+	public int getLignes(){
+		return lignes;
+	}
+	
+	public int getColonnes(){
+		return colonnes;
+	}
 	
 	public boolean isAffichageOn() {
 		return map.isAffichageOn();
@@ -30,8 +37,9 @@ public class Physique {
 	public void AffichageOff() {
 		map.AffichageOff();
 	}
+
 	
-	public Physique(int lignes, int colonnes){
+	public Physique(){
 		map = new Terrain(lignes, colonnes);
 	}
 	public Terrain getMap(){
@@ -90,16 +98,24 @@ public class Physique {
 		map.addTank();
 	}
 	
-	public Tank addTank(String filepath)
+	public void addTank(Tank tank){
+		map.addTank(tank);
+	}
+	
+	public void removeTank(Tank tank){
+		map.removeTank(tank);
+	}
+	
+	public void addTank(String filepath)
 	/**
 	 * ajoute un tank avec l'ia dans le fichier filepath
 	 * @param filepath  position du fichier
 	 */
 	{
-		return map.addTank(filepath);
+		map.addTank(filepath);
 	}
 	
-	public Tank addTank(int x, int y, String filepath)
+	public void addTank(int x, int y, String filepath)
 	/**
 	 * ajoute un tank avec l'ia dans le fichier filepath à la position(x,y)
 	 * @param x  coordonée x du tank
@@ -108,20 +124,16 @@ public class Physique {
 	 */
 	{
 		if(estLibre(x, y))
-			return map.addTank(x,y,filepath,this);
-		else
-			System.out.println("pas libre ! ");
-		return null;
+			map.addTank(x,y,filepath,this);
 	}
 	
-	/*public ArrayList<Projectile> getProjectiles()
-	**
+	public ArrayList<Projectile> getProjectiles()
+	/**
 	 * retourne la liste des Projectiles
-	 *
+	 */
 	{
 		return map.getProjectiles();
-	}*/
-
+	}
 	
 	public ArrayList<Mobile> getMobiles()
 	/**
@@ -131,10 +143,8 @@ public class Physique {
 		ArrayList<Mobile> m = new ArrayList<Mobile>();
 		for(Tank t : getTanks())
 			m.add(t);
-
-	/*	for(Projectile p : getProjectiles())
-			m.add(p);*/
-
+		for(Projectile p : getProjectiles())
+			m.add(p);
 		return m;
 	}
 	
@@ -150,137 +160,82 @@ public class Physique {
 		map.newMur(x, y);
 	}
 	
-	public boolean iterFluidite(Mobile t)
-	{
-		if (t.getAvancement() != 0)
-		{
-			if (t.getDeplacementStatus() == null)
-				return true;
-			if (t.getDeplacementStatus() ==  Action.moveBackward)
-			{
-				t.incAvancement(Mobile.vitesseAvancement);
-				return true;
-			}
-			else
-			{
-				
-				t.decAvancement(Mobile.vitesseAvancement);
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	public void iter(){
 		/**
 	 	* lance la prochaine action de tout les éléments du Terrain
 	 	*/
-		GraphicInterface.updateOutputArea();
-
-		Tank t;
-		int mobId;
-		System.out.println(map.getProjectile());
-		if (map.getProjectile() != null)
-		{
-			if (iterFluidite(map.getProjectile()))
-				return;
-			
-			mobId = map.getProjectile().avancer();
-			
-			try {
-				Thread.sleep(25);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			
-			
-			/* Si un tank est détruit et qu'il était placé avant ou à à l'emplacement du tour courant dans la liste, on ne modifie pas le tour courant
-			 * La suppression d'un élément d'un arraylist décale automatiquement tous les autres éléments vers la gauche.
-			 * tour = tour - 1;
-			 */
-			if (mobId != -1) /* Un tank est détruit par le projectile */
-			{
-				for (int j = 0; j < getTanks().size() && j <= tour; j++ )
-				{
-					if (getTanks().get(j).getId() == mobId)
-					{
-						tour--;
-						break;
+		
+		int i = 0;
+		
+		for(Tank t : getTanks()){
+			t.lancerIA();
+			t.reduireTempsRestant();
+		}
+		
+		ArrayList<Projectile> ps = map.getProjectiles();
+		if(ps.size() > 0){
+			Projectile p = ps.get(i);
+			while(p != null && i < ps.size()){
+				p.avancer();
+				if(i < ps.size()){
+					if( !p.getMort()){
+						i++;
+						if(i < ps.size())
+							p = ps.get(i);
 					}
+					else
+						if(Projectile.getIdMort() == -1)
+							p=ps.get(i);
+						else{
+							if(p.getId() > Projectile.getIdMort()){
+								i = i--;
+								if(i < ps.size())
+									p = ps.get(i);
+							}
+							else{
+								if(i < ps.size())
+									p = ps.get(i);
+							}
+							Projectile.initIdMort();
+						}
 				}
 			}
-			
 		}
-		else
-		{
-			if (getTanks().size() != 0)
-			{
-				t = getTanks().get(tour % getTanks().size());
-				
-				if (iterFluidite(t))
-					return;
-				
-				
-				t.setDeplacementStatus(null);
-				tour = (tour + 1) % getTanks().size();
-				System.out.println("Tour numero "+tour);
-					
-					t = getTanks().get(tour);
-					t.lancerIA();
-					
-					t.reduireTempsRestant();
-					
-					try {
-						Thread.sleep(25);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					
-					if (GraphicInterface.stoped == 2)
-					{
-						GraphicInterface.stoped = 1;
-						
-					}
-					
-					t.getAction();
-					if (GraphicInterface.getSelectedTank() == t)
-					{
-						GraphicInterface.updateHighlight(t.getIntel().getScript().getCurrentLine());
-					}
-					
-				
-					GraphicInterface.NextStepFlag = false;
-					
-					
-			
-			}
 		
 		
+		//Tank.getIntels().waitForAllActions();
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-	
-	}
-
-	public void destroyTank(Tank selectedTank) {
-		System.out.println(getTanks().size());
-	 for (int i = 0; i < getTanks().size(); i++)
-		{
-		 Tank t = getTanks().get(i);
-			if (t == selectedTank)
-			{
-				File file = new File("src/ressources/"+t.getIntel().getScript().getTmpFileName());
-				file.delete();
-				map.erase(t.getCoordX(), t.getCoordY());
-				getTanks().remove(t);
-				map.removeTank(t);
-				tour = 0;
+		
+		
+		i = 0;
+		ArrayList<Tank> ts = getTanks();
+		if(ts.size() > 0){
+			Tank t = ts.get(i);
+			while(t != null && i < ts.size()){
+				t.getAction();
+				if(i < ts.size()){
+					if( !t.getMort()){
+						i++;
+						if(i< ts.size())
+							t = ts.get(i);
+					}
+				else
+					t = ts.get(i);
+				}
 			}
 		}
+		
 		
 	}
 	
 	
-
+	
+	
 }
 
 
