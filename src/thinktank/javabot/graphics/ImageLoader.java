@@ -27,24 +27,24 @@ public class ImageLoader {
 	
 	public ImageLoader(){
 		try {
-		    img[SpriteName.MUR.ordinal()] = 
+			img[SpriteName.MUR.ordinal()] = 
 		    		toBufferedImage(ImageIO.read(new File(images_folder + "mur.png")));
 		    img[SpriteName.MISSILE.ordinal()] =
 		    		toBufferedImage(ImageIO.read(new File(images_folder + "missile.png")));
 		    img[SpriteName.SOL.ordinal()] =
 		    		toBufferedImage(ImageIO.read(new File(images_folder + "sol.png")));
 		    img[SpriteName.TANKH.ordinal()] = 
-		    		toBufferedImage(ImageIO.read(new File(images_folder + "tankH.png")));
+		    		toBufferedImage(ImageIO.read(new File(images_folder + "TankHRed.png")));
 		    img[SpriteName.TANKB.ordinal()] = 
-		    		toBufferedImage(ImageIO.read(new File(images_folder + "tankB.png")));
+		    		toBufferedImage(ImageIO.read(new File(images_folder + "TankBRed.png")));
 		    img[SpriteName.TANKD.ordinal()] = 
-		    		toBufferedImage(ImageIO.read(new File(images_folder + "tankD.png")));
+		    		toBufferedImage(ImageIO.read(new File(images_folder + "TankDRed.png")));
 		    img[SpriteName.TANKG.ordinal()] = 
-		    		toBufferedImage(ImageIO.read(new File(images_folder + "tankG.png")));
+		    		toBufferedImage(ImageIO.read(new File(images_folder + "TankGRed.png")));
 		    img[SpriteName.HIGHLIGHT.ordinal()] = 
 		    		toBufferedImage(ImageIO.read(new File(images_folder + "select.png")));
 		} catch (IOException e) {
-			System.out.println("Problème d'ouverture des images.");
+			System.out.println("Problï¿½me d'ouverture des images.");
 		}
 	}
 	
