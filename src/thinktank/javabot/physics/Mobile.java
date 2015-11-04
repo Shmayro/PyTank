@@ -61,7 +61,6 @@ public abstract class Mobile implements ObjetTT{
 			coordX = coordX -direction.getDx();
 			coordY = coordY - direction.getDy();
 			map.erase(old_x,old_y);
-
 		}
 		//System.out.println("type: "+getType()+" id:"+getId()+" newX: "+coordX+" newY: "+coordY);
 
